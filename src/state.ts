@@ -3,5 +3,5 @@ export interface Value {
 }
 
 export const SharedState: { value: Value } = {
-  value: { value: '6' },
+  value: { value: '7' },
 }

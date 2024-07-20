@@ -3,6 +3,7 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import { SharedState } from "./state";
+import { useSharedState } from "./useShareState";
 
 export interface AppProps {
   value: Record<string, unknown>;
@@ -13,14 +14,16 @@ export interface Value {
 const App: React.FC<AppProps> = ({ value }) => {
   const renderCount = useRef(0);
 
-  const [localValue, setLocalValue] = useState<Record<string, unknown>>(value);
+  const [localValue, setLocalValue] = useState<Record<string, unknown>>(
+    useSharedState(value)
+  );
   const [timesChanged, setTimesChanged] = useState<number>(0);
-  const handValueSync = () => {
-    // debugger;
-    if (JSON.stringify(localValue) !== JSON.stringify(SharedState.value)) {
-      setLocalValue({ ...SharedState.value });
-    }
-  };
+  // const handValueSync = () => {
+  //   // debugger;
+  //   if (JSON.stringify(localValue) !== JSON.stringify(SharedState.value)) {
+  //     setLocalValue({ ...SharedState.value });
+  //   }
+  // };
 
   // Update our shared state with a copy of our local value
   // useEffect(() => {
@@ -28,15 +31,17 @@ const App: React.FC<AppProps> = ({ value }) => {
   // }, [localValue])
 
   // Sync shared value to local
-  const sharedStateValue = SharedState.value;
+  // const sharedStateValue = SharedState.value;
+  // useEffect(() => {
+  //   SharedState.value = { ...localValue };
+  //   handValueSync();
+  // }, [sharedStateValue]);
   useEffect(() => {
-    SharedState.value = { ...localValue };
-    handValueSync();
-  }, [sharedStateValue]);
+    SharedState.value = value;
+    setLocalValue(value);
+  }, [value, setLocalValue]);
 
   renderCount.current++;
-  console.log("shared vs local", SharedState, localValue);
-
   return (
     <>
       <div>
@@ -52,15 +57,16 @@ const App: React.FC<AppProps> = ({ value }) => {
         <p>Rendered {renderCount.current} times</p>
         <button
           onClick={() => {
-            SharedState.value = { value: Math.random().toString(36).slice(2) };
-            setLocalValue({ ...SharedState });
+            const newValue = { value: Math.random().toString(36).slice(2) };
+            SharedState.value = newValue;
+            setLocalValue(newValue);
             setTimesChanged(timesChanged + 1);
           }}
         >
           Update shared value
         </button>
-        <p>The local value is {String(localValue["value"]?.value)}</p>
-        <p>The shared value is {String(SharedState.value["value"])}</p>
+        <p>The local value is {JSON.stringify(localValue.value)}</p>
+        <p>The shared value is {JSON.stringify(SharedState.value["value"])}</p>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>

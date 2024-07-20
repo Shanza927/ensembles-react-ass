@@ -12,30 +12,26 @@
 
 //     return { localState, setLocalState }
 // }
-
 import { useEffect, useState } from "react";
 import { SharedState, Value } from "./state";
-console.log("shared stat at hook", SharedState)
-export const useSharedState = () => {
-    const [localState, setLocalState] = useState<Value>({ ...SharedState.value });
 
-    useEffect(() => {
-        const syncState = () => {
-            if (JSON.stringify(localState) !== JSON.stringify(SharedState.value)) {
-                setLocalState({ ...SharedState.value });
-            }
-        };
+export const useSharedState = (initialValue: Value) => {
+    const [localState, setLocalState] = useState<Value>(initialValue);
 
-        syncState();
+    // Sync shared state to local state
+    // useEffect(() => {
+    //     SharedState.value = value;
+    // setLocalValue(value);
+    //     setLocalState({ ...SharedState.value });
+    // }, []);
 
-        const interval = setInterval(syncState, 100);
-
-        return () => clearInterval(interval);
-    }, []);
-
+    // Sync local state to shared state
     useEffect(() => {
         SharedState.value = { ...localState };
     }, [localState]);
 
     return { localState, setLocalState };
 };
+
+
+
