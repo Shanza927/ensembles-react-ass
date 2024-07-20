@@ -4,9 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsc && vite build",
-    "coverage": "vitest run --coverage",
     "dev": "vite",
+    "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui"
@@ -26,7 +25,7 @@
     "@vitest/ui": "latest",
     "jsdom": "latest",
     "typescript": "^5.2.2",
-    "vite": "latest",
+    "vite": "^5.3.4",
     "vitest": "latest"
   }
 }
