@@ -1,29 +1,25 @@
-import { useEffect, useRef, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { SharedState } from './state'
-
+import { useRef, useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
+import useSharedStateSync from "./useShareState";
+import { SharedState } from "./state";
 export interface AppProps {
-  value: Record<string, unknown>
+  value: Record<string, unknown>;
 }
 
 const App: React.FC<AppProps> = ({ value }) => {
   const renderCount = useRef(0);
 
-  const [localValue, setLocalValue]  = useState<Record<string, unknown>>(value);
+  const [localValue, updateSharedState] = useSharedStateSync(value);
   const [timesChanged, setTimesChanged] = useState<number>(0);
 
-  // Update our shared state with a copy of our local value
-  useEffect(() => {
-    SharedState.value = {...localValue};
-  }, [localValue])
-
-  // Sync shared value to local
-  const sharedStateValue = SharedState.value;
-  useEffect(() => {
-    setLocalValue({...sharedStateValue})
-  }, [sharedStateValue])
+  const IsEmpty = (value: any) => {
+    return (
+      value == null ||
+      (typeof value === "object" && Object.keys(value).length === 0)
+    );
+  };
 
   renderCount.current++;
 
@@ -39,20 +35,26 @@ const App: React.FC<AppProps> = ({ value }) => {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <p>
-          Rendered {renderCount.current} times
-        </p>
-        <button onClick={() => {
-          SharedState.value = ({ value: Math.random().toString(36).slice(2) })
-          setTimesChanged(timesChanged + 1);
-        }}>
+        <p>Rendered {renderCount.current} times</p>
+        <button
+          onClick={() => {
+            updateSharedState({ value: Math.random().toString(36).slice(2) });
+            setTimesChanged(timesChanged + 1);
+          }}
+        >
           Update shared value
         </button>
         <p>
-          The local value is {String(localValue['value'])}
+          The local value is{" "}
+          {IsEmpty(localValue["value"])
+            ? "undefined"
+            : String(localValue["value"])}
         </p>
         <p>
-          The shared value is {String(sharedStateValue['value'])}
+          The shared value is{" "}
+          {IsEmpty(SharedState.value["value"])
+            ? "undefined"
+            : String(SharedState.value["value"])}
         </p>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
@@ -62,7 +64,7 @@ const App: React.FC<AppProps> = ({ value }) => {
         Click on the Vite and React logos to learn more
       </p>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;
