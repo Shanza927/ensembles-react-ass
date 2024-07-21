@@ -14,6 +14,13 @@ const App: React.FC<AppProps> = ({ value }) => {
   const [localValue, updateSharedState] = useSharedStateSync(value);
   const [timesChanged, setTimesChanged] = useState<number>(0);
 
+  const IsEmpty = (value: any) => {
+    return (
+      value == null ||
+      (typeof value === "object" && Object.keys(value).length === 0)
+    );
+  };
+
   renderCount.current++;
 
   return (
@@ -37,8 +44,18 @@ const App: React.FC<AppProps> = ({ value }) => {
         >
           Update shared value
         </button>
-        <p>The local value is {String(localValue["value"])}</p>
-        <p>The shared value is {String(SharedState.value["value"])}</p>
+        <p>
+          The local value is{" "}
+          {IsEmpty(localValue["value"])
+            ? "undefined"
+            : String(localValue["value"])}
+        </p>
+        <p>
+          The shared value is{" "}
+          {IsEmpty(SharedState.value["value"])
+            ? "undefined"
+            : String(SharedState.value["value"])}
+        </p>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
