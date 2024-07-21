@@ -10,7 +10,7 @@ export const SharedState: {
   unsubscribe: (listener: Listener) => void;
   setValue: (newValue: Value) => void;
 } = {
-  value: { value: '6' },
+  value: {},
   listeners: new Set(),
 
   subscribe(listener: Listener) {
