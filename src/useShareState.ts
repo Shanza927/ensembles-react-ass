@@ -2,7 +2,12 @@ import { useState, useEffect } from 'react';
 import { SharedState, Value } from './state';
 
 const useSharedStateSync = (initialValue: Value) => {
-    const [localValue, setLocalValue] = useState<Value>(initialValue);
+    const [localValue, setLocalValue] = useState<Value>(() => {
+        if (!SharedState.value.value) {
+            SharedState.value = initialValue;
+        }
+        return { ...SharedState.value };
+    });
 
     useEffect(() => {
         const handleChange = () => setLocalValue({ ...SharedState.value });

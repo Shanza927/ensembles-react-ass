@@ -4,7 +4,6 @@ import useSharedStateSync from '../useShareState';
 
 describe('useSharedStateSync', () => {
     beforeEach(() => {
-        // Reset SharedState before each test
         SharedState.value = { value: 'initial' };
         SharedState.listeners.clear();
     });

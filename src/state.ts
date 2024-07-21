@@ -1,7 +1,6 @@
 export interface Value {
   value?: string;
 }
-
 type Listener = (value: Value) => void;
 
 export const SharedState: {
@@ -11,7 +10,7 @@ export const SharedState: {
   unsubscribe: (listener: Listener) => void;
   setValue: (newValue: Value) => void;
 } = {
-  value: {},
+  value: { value: '6' },
   listeners: new Set(),
 
   subscribe(listener: Listener) {

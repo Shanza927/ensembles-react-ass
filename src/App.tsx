@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
+import useSharedStateSync from "./useShareState";
 import { SharedState } from "./state";
-
 export interface AppProps {
   value: Record<string, unknown>;
 }
@@ -11,16 +11,8 @@ export interface AppProps {
 const App: React.FC<AppProps> = ({ value }) => {
   const renderCount = useRef(0);
 
-  const [localValue, setLocalValue] = useState<Record<string, unknown>>(value);
+  const [localValue, updateSharedState] = useSharedStateSync(value);
   const [timesChanged, setTimesChanged] = useState<number>(0);
-
-  // Sync shared value to local
-  const sharedStateValue = SharedState.value;
-  useEffect(() => {
-    if (JSON.stringify(localValue) !== JSON.stringify(sharedStateValue)) {
-      setLocalValue({ ...sharedStateValue });
-    }
-  }, [sharedStateValue]);
 
   renderCount.current++;
 
@@ -39,14 +31,14 @@ const App: React.FC<AppProps> = ({ value }) => {
         <p>Rendered {renderCount.current} times</p>
         <button
           onClick={() => {
-            SharedState.value = { value: Math.random().toString(36).slice(2) };
+            updateSharedState({ value: Math.random().toString(36).slice(2) });
             setTimesChanged(timesChanged + 1);
           }}
         >
           Update shared value
         </button>
         <p>The local value is {String(localValue["value"])}</p>
-        <p>The shared value is {String(sharedStateValue["value"])}</p>
+        <p>The shared value is {String(SharedState.value["value"])}</p>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
