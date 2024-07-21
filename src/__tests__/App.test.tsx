@@ -1,1 +1,1 @@
-// test.todo("App renders [n] times")
+test.todo("App renders [n] times");

@@ -1,37 +1,24 @@
-// import { useEffect, useState } from "react";
-// import { SharedState } from "./state";
+import { useState, useEffect } from 'react';
+import { SharedState, Value } from './state';
 
-// export const useSharedState = () => {
-//     const [localState, setLocalState] = useState({ ...SharedState.value });
-//     useEffect(() => {
-//         if (JSON.stringify(localState) !== JSON.stringify(SharedState.value)) {
-//             setLocalState({ ...SharedState.value });
-//         }
-//     }, [SharedState.value]);
+const useSharedStateSync = (initialValue: Value) => {
+    const [localValue, setLocalValue] = useState<Value>(initialValue);
 
-
-//     return { localState, setLocalState }
-// }
-import { useEffect, useState } from "react";
-import { SharedState, Value } from "./state";
-
-export const useSharedState = (initialValue: Value) => {
-    const [localState, setLocalState] = useState<Value>(initialValue);
-
-    // Sync shared state to local state
-    // useEffect(() => {
-    //     SharedState.value = value;
-    // setLocalValue(value);
-    //     setLocalState({ ...SharedState.value });
-    // }, []);
-
-    // Sync local state to shared state
     useEffect(() => {
-        SharedState.value = { ...localState };
-    }, [localState]);
+        const handleChange = () => setLocalValue({ ...SharedState.value });
+        SharedState.subscribe(handleChange);
 
-    return { localState, setLocalState };
+        return () => {
+            SharedState.unsubscribe(handleChange);
+        };
+    }, []);
+
+    const updateSharedState = (newValue: Value) => {
+        SharedState.setValue(newValue);
+        setLocalValue(newValue);
+    };
+
+    return [localValue, updateSharedState] as const;
 };
 
-
-
+export default useSharedStateSync;
