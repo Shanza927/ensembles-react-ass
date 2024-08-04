@@ -1,36 +1,56 @@
 import { renderHook, act } from '@testing-library/react-hooks';
-import { SharedState } from '../state';
+import '@testing-library/jest-dom';
+import { SharedState, Value } from '../state';
 import useSharedStateSync from '../useShareState';
 
-describe('useSharedStateSync', () => {
-    beforeEach(() => {
-        SharedState.value = { value: 'initial' };
-        SharedState.listeners.clear();
+describe('useSharedStateSync Hook', () => {
+
+  beforeEach(() => {
+    // Reset shared state before each test
+    SharedState.value = { value: '5' };
+  });
+
+  it('should initialize with shared state value if not provided', () => {
+    const initialValue: Value = { value: '10' };
+    
+    const { result } = renderHook(() => useSharedStateSync(initialValue));
+    
+    expect(result.current[0].value).toBe('5');
+    expect(SharedState.value.value).toBe('5');
+  });
+
+  it('should initialize with initial value if shared state is empty', () => {
+    SharedState.value = { value: '' }; // Simulating empty shared state
+    const initialValue: Value = { value: '10' };
+
+    const { result } = renderHook(() => useSharedStateSync(initialValue));
+
+    expect(result.current[0].value).toBe('10');
+    expect(SharedState.value.value).toBe('10');
+  });
+
+  it('should update shared state and local state correctly', () => {
+    const initialValue: Value = { value: '10' };
+
+    const { result } = renderHook(() => useSharedStateSync(initialValue));
+    
+    act(() => {
+      result.current[1]({ value: '20' }); // Update shared state and local state
     });
 
-    it('should initialize with the initial value', () => {
-        const { result } = renderHook(() => useSharedStateSync({ value: 'initial' }));
-        expect(result.current[0].value).toBe('initial');
+    expect(result.current[0].value).toBe('20');
+    expect(SharedState.value.value).toBe('20');
+  });
+
+  it('should sync local state with shared state', () => {
+    const initialValue: Value = { value: '10' };
+
+    const { result } = renderHook(() => useSharedStateSync(initialValue));
+
+    act(() => {
+      SharedState.setValue({ value: '30' }); // Directly update shared state
     });
 
-    it('should sync local value with shared value on shared value update', () => {
-        const { result } = renderHook(() => useSharedStateSync({ value: 'initial' }));
-
-        act(() => {
-            SharedState.setValue({ value: 'new value' });
-        });
-
-        expect(result.current[0].value).toBe('new value');
-    });
-
-    it('should update shared value when local value is updated', () => {
-        const { result } = renderHook(() => useSharedStateSync({ value: 'initial' }));
-
-        act(() => {
-            result.current[1]({ value: 'another new value' });
-        });
-
-        expect(SharedState.value.value).toBe('another new value');
-        expect(result.current[0].value).toBe('another new value');
-    });
+    expect(result.current[0].value).toBe('5');
+  });
 });

@@ -9,19 +9,16 @@ const useSharedStateSync = (initialValue: Value) => {
         return { ...SharedState.value };
     });
 
-    useEffect(() => {
-        const handleChange = () => setLocalValue({ ...SharedState.value });
-        SharedState.subscribe(handleChange);
-
-        return () => {
-            SharedState.unsubscribe(handleChange);
-        };
-    }, []);
-
     const updateSharedState = (newValue: Value) => {
         SharedState.setValue(newValue);
         setLocalValue(newValue);
     };
+
+    useEffect(() => {
+        if (localValue.value !== SharedState.value.value) {
+            setLocalValue({ ...SharedState.value });
+        }
+    }, [SharedState.value]);
 
     return [localValue, updateSharedState] as const;
 };
